@@ -1,0 +1,20 @@
+{           //You dont need the schema vscode pulls it automatically//
+  "display": "Node LTS (24)",
+  "_version": "24.0.0",
+  "compilerOptions": {
+    "lib": [
+      "es2024"
+    ],
+    "module": "node16",
+    "target": "es2024",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,  // Extra rule for protection
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node16"
+  },
+  "include": [
+    "src"
+  ]
+}
