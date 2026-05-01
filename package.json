@@ -7,7 +7,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "link-cli": "yarn --global unlink typescriptcli && yarn --global link",
+    "link-cli": "(yarn --global unlink typescriptcli || true) && yarn --global link",
     "dev": "tsc --watch"
   },
   "keywords": [],
