@@ -1,10 +1,12 @@
-{           //You dont need the schema vscode pulls it automatically//
-  "display": "Node LTS (24)",
-  "_version": "24.0.0",
+{
+  "display": "Node LTS",
+  "_version": "18.1.0",
   "compilerOptions": {
     "lib": [
       "es2024"
     ],
+    "rootDir": "src",
+    "outDir": "dist",  // this will emit all the typrscript that you are trying to pull and put in the dist directory
     "module": "node16",
     "target": "es2024",
     "strict": true,
@@ -12,7 +14,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node16"
+    "moduleResolution": "node16",
+    "types": ["node"]
   },
   "include": [
     "src"
