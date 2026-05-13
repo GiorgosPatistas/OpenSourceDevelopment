@@ -108,6 +108,16 @@
             document.body.removeChild(ta);
         }
 
+        // ── Estimated Reading Time ─────────────────────────────────────────
+        var readingTimeEl = document.getElementById('readingTime');
+        var contentEl = document.querySelector('.page-content');
+
+        if (readingTimeEl && contentEl) {
+            var words = contentEl.innerText.trim().split(/\s+/).length;
+            var minutes = Math.max(1, Math.round(words / 200));
+            readingTimeEl.textContent = '~' + minutes + ' min read';
+        }
+
         // ── Reading Progress Bar ─────────────────────────────────────────────
         // Ενεργοποιείται μόνο σε άρθρα (σελίδες που έχουν .page-content)
         var progressBar = document.getElementById('progress-bar');

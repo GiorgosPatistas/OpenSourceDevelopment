@@ -59,7 +59,7 @@ my-ssg/
 
 **1. Clone the repository:**
 ```bash
-git clone https://github.com/georgepatistas/my-ssg.git
+git clone https://github.com/GiorgosPatistas/OpenSourceDevelopment.git
 cd my-ssg
 ```
 

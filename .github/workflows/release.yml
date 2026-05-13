@@ -1,0 +1,72 @@
+name: Release
+
+# Τρέχει μόνο όταν κάνεις push ένα tag της μορφής v1.0.0
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write       # χρειάζεται για να δημιουργήσει το GitHub Release
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+          cache-dependency-path: engine/go.sum
+
+      - name: Download Go dependencies
+        working-directory: engine
+        run: go mod tidy
+
+      # Cross-compile για όλες τις πλατφόρμες
+      - name: Build — Linux (amd64)
+        working-directory: engine
+        run: GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ../bin/engine-linux .
+
+      - name: Build — Windows (amd64)
+        working-directory: engine
+        run: GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o ../bin/engine-windows.exe .
+
+      - name: Build — macOS Intel (amd64)
+        working-directory: engine
+        run: GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o ../bin/engine-mac .
+
+      - name: Build — macOS Apple Silicon (arm64)
+        working-directory: engine
+        run: GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o ../bin/engine-mac-arm64 .
+
+      # Δημιουργία του GitHub Release με τα binaries attached
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "my-ssg ${{ github.ref_name }}"
+          body: |
+            ## my-ssg ${{ github.ref_name }}
+
+            ### Download
+
+            | Platform | File |
+            |---|---|
+            | Windows (64-bit) | `engine-windows.exe` |
+            | macOS Intel | `engine-mac` |
+            | macOS Apple Silicon (M1/M2/M3) | `engine-mac-arm64` |
+            | Linux (64-bit) | `engine-linux` |
+
+            ### Installation
+            Download the binary for your platform and place it in the `bin/` folder of your project.
+          files: |
+            bin/engine-linux
+            bin/engine-windows.exe
+            bin/engine-mac
+            bin/engine-mac-arm64

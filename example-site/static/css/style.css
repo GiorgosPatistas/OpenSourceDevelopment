@@ -172,9 +172,27 @@ body {
     margin: 0 0 0.5rem;
 }
 
+.page-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.4rem;
+}
+
 .page-date {
     color: var(--color-muted);
     font-size: 0.9rem;
+}
+
+.reading-time {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+}
+
+/* Διαχωριστής ανάμεσα στην ημερομηνία και το reading time */
+.page-date + .reading-time:not(:empty)::before {
+    content: "·";
+    margin-right: 0.75rem;
 }
 
 .page-description {
