@@ -1,19 +1,19 @@
 ---
-title: "Σχετικά με μένα"
-description: "Λίγα λόγια για τον συγγραφέα"
+title: "About"
+description: "A few words about the author"
 date: 2024-01-01
 ---
 
-# Σχετικά με μένα
+# About
 
-Γεια σου! Είμαι ένας developer που φτιάχνει τα δικά του εργαλεία.
+Hi! I'm a developer who likes building his own tools.
 
-## Τεχνολογίες που αγαπάω
+## Technologies I love
 
-- **Go** — για performance και simplicity
-- **TypeScript** — για type-safe frontend/CLI εργαλεία
-- **Markdown** — για να γράφω χωρίς να ανησυχώ για formatting
+- **Go** — for performance and simplicity
+- **TypeScript** — for type-safe frontend/CLI tools
+- **Markdown** — for writing without worrying about formatting
 
-## Επικοινωνία
+## Contact
 
-Μπορείς να με βρεις στο GitHub!
+You can find me on GitHub!

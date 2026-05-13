@@ -1,14 +1,14 @@
 ---
 title: "Hello World!"
-description: "Το πρώτο μου post"
+description: "My first blog post"
 date: 2024-06-01
 ---
 
 # Hello World!
 
-Καλωσόρισες στο πρώτο μου blog post! Αυτό είναι ένα δείγμα markdown αρχείου.
+Welcome to my first blog post! This is a sample markdown file.
 
-## Τι μπορείς να γράψεις
+## What you can write
 
 ### Code blocks
 
@@ -24,16 +24,16 @@ func main() {
 
 ### Tables
 
-| Γλώσσα     | Χρήση              |
+| Language   | Use                |
 |------------|--------------------|
 | Go         | Backend / CLI      |
 | TypeScript | Frontend / Tooling |
 | Markdown   | Content            |
 
-### Lists με tasks
+### Task lists
 
-- [x] Φτιάξε τον markdown parser
-- [x] Φτιάξε τον template renderer
-- [ ] Προσθήκη RSS feed
+- [x] Build the markdown parser
+- [x] Build the template renderer
+- [ ] Add RSS feed
 
-Αυτό είναι όλο! Απόλαυσε το site σου. 🚀
+That's it! Enjoy your site. 🚀

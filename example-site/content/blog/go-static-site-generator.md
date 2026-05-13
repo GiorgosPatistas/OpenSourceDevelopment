@@ -1,30 +1,27 @@
 ---
-title: "Πώς έφτιαξα έναν Static Site Generator με Go"
-description: "Η ιστορία πίσω από αυτό το project"
+title: "How I Built a Static Site Generator with Go"
+description: "The story behind this project"
 date: 2024-07-15
 ---
 
-# Πώς έφτιαξα έναν Static Site Generator με Go
+# How I Built a Static Site Generator with Go
 
-Ήθελα να καταλάβω πώς λειτουργεί ένας SSG από μέσα.
-Αποφάσισα να φτιάξω τον δικό μου από το μηδέν.
+I wanted to understand how an SSG works under the hood, so I decided to build one from scratch.
 
-## Η αρχιτεκτονική
+## Architecture
 
-Το project αποτελείται από δύο μέρη:
+The project is made up of two parts:
 
-1. **TypeScript CLI** — η interface που βλέπει ο χρήστης
-2. **Go Engine** — ο πυρήνας που κάνει τη δουλειά
+1. **TypeScript CLI** — the interface the user interacts with
+2. **Go Engine** — the core that does the heavy lifting
 
-Ο λόγος για αυτή τη διαχωρισμένη αρχιτεκτονική είναι ότι η Go
-δίνει εξαιρετική performance για file processing, ενώ το TypeScript
-ecosystem είναι ιδανικό για CLIs.
+The reason for this split architecture is that Go delivers excellent performance for file processing, while the TypeScript ecosystem is ideal for building CLIs.
 
-## Τεχνικές λεπτομέρειες
+## Technical Details
 
-Το Go engine χρησιμοποιεί:
-- **goldmark** για markdown parsing (CommonMark compliant)
-- **html/template** για safe HTML rendering
-- **gopkg.in/yaml.v3** για front matter parsing
+The Go engine uses:
+- **goldmark** for markdown parsing (CommonMark compliant)
+- **html/template** for safe HTML rendering
+- **gopkg.in/yaml.v3** for front matter parsing
 
-Σύνολο dependencies: μόλις 2! Αυτό είναι η ομορφιά της Go.
+Total dependencies: just 2! That's the beauty of Go.
