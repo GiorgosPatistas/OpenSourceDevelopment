@@ -6,7 +6,7 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	t.Run("valid front matter με όλα τα πεδία", func(t *testing.T) {
+	t.Run("valid front matter with all fields", func(t *testing.T) {
 		input := []byte(`---
 title: "Hello World"
 date: 2024-01-15
@@ -33,7 +33,7 @@ draft: false
 		}
 	})
 
-	t.Run("χωρίς front matter επιστρέφει ErrNoFrontMatter", func(t *testing.T) {
+	t.Run("missing front matter returns ErrNoFrontMatter", func(t *testing.T) {
 		input := []byte("# Just markdown, no front matter")
 		_, err := Parse(input)
 		if !errors.Is(err, ErrNoFrontMatter) {
@@ -41,7 +41,7 @@ draft: false
 		}
 	})
 
-	t.Run("invalid YAML επιστρέφει ErrInvalidFrontMatter", func(t *testing.T) {
+	t.Run("invalid YAML returns ErrInvalidFrontMatter", func(t *testing.T) {
 		input := []byte("---\ntitle: [invalid yaml\n---\n")
 		_, err := Parse(input)
 		if !errors.Is(err, ErrInvalidFrontMatter) {
@@ -71,7 +71,7 @@ draft: false
 		}
 	})
 
-	t.Run("άδειο body μετά το front matter", func(t *testing.T) {
+	t.Run("empty body after front matter", func(t *testing.T) {
 		input := []byte("---\ntitle: Empty Body\n---\n")
 		page, err := Parse(input)
 		if err != nil {
@@ -82,7 +82,7 @@ draft: false
 		}
 	})
 
-	t.Run("εντελώς άδεια είσοδος", func(t *testing.T) {
+	t.Run("completely empty input", func(t *testing.T) {
 		_, err := Parse([]byte(""))
 		if !errors.Is(err, ErrNoFrontMatter) {
 			t.Errorf("expected ErrNoFrontMatter for empty input, got: %v", err)

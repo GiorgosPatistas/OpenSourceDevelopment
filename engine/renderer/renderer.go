@@ -11,7 +11,7 @@ import (
 	"github.com/georgepatistas/my-ssg/parser"
 )
 
-// SiteData περιέχει global πληροφορίες για το site που είναι διαθέσιμες σε όλα τα templates.
+// SiteData holds global site information available to all templates.
 type SiteData struct {
 	SiteTitle   string
 	SiteURL     string
@@ -19,15 +19,15 @@ type SiteData struct {
 	BuildDate   time.Time
 }
 
-// PageData είναι τα δεδομένα που περνάμε στο template για κάθε σελίδα.
+// PageData holds the data passed to the template for each page.
 type PageData struct {
 	Site    SiteData
 	Page    *parser.Page
-	Content template.HTML // το HTML content (marked safe για να μην γίνει escape)
-	Pages   []*parser.Page // όλες οι σελίδες (για navigation/index)
+	Content template.HTML  // HTML content (marked safe to prevent escaping)
+	Pages   []*parser.Page // all pages (for navigation/index)
 }
 
-// Renderer φορτώνει και εκτελεί τα HTML templates.
+// Renderer loads and executes HTML templates.
 type Renderer struct {
 	templateDir string
 	siteData    SiteData
@@ -37,11 +37,11 @@ type Renderer struct {
 	indexPath   string
 }
 
-// New δημιουργεί έναν Renderer ελέγχοντας ότι υπάρχουν τα απαραίτητα templates.
+// New creates a Renderer, verifying that the required templates exist.
 func New(templateDir string, siteData SiteData) (*Renderer, error) {
 	layoutPath := filepath.Join(templateDir, "layout.html")
 	if _, err := os.Stat(layoutPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("δεν βρέθηκε το templates/layout.html")
+		return nil, fmt.Errorf("templates/layout.html not found")
 	}
 
 	funcMap := template.FuncMap{
@@ -69,7 +69,7 @@ func New(templateDir string, siteData SiteData) (*Renderer, error) {
 		layoutPath:  layoutPath,
 	}
 
-	// Καταχώρηση προαιρετικών template paths
+	// Register optional template paths
 	pagePath := filepath.Join(templateDir, "page.html")
 	if _, err := os.Stat(pagePath); !os.IsNotExist(err) {
 		r.pagePath = pagePath
@@ -80,7 +80,7 @@ func New(templateDir string, siteData SiteData) (*Renderer, error) {
 		r.indexPath = indexPath
 	}
 
-	// Validation: δοκιμαστικό parse του layout για να πιάσουμε syntax errors νωρίς
+	// Validation: do a trial parse of the layout to catch syntax errors early
 	if err := r.validateLayout(); err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func New(templateDir string, siteData SiteData) (*Renderer, error) {
 	return r, nil
 }
 
-// validateLayout κάνει ένα δοκιμαστικό parse για να πιάσει syntax errors.
+// validateLayout does a trial parse to catch syntax errors.
 func (r *Renderer) validateLayout() error {
 	files := []string{r.layoutPath}
 	if r.pagePath != "" {
@@ -96,15 +96,15 @@ func (r *Renderer) validateLayout() error {
 	}
 	_, err := template.New("layout.html").Funcs(r.funcMap).ParseFiles(files...)
 	if err != nil {
-		return fmt.Errorf("σφάλμα parsing templates: %w", err)
+		return fmt.Errorf("error parsing templates: %w", err)
 	}
 	return nil
 }
 
-// RenderPage εφαρμόζει το layout + page template σε μια σελίδα.
-// Αποτέλεσμα: πλήρες HTML αρχείο.
+// RenderPage applies the layout + page template to a single page.
+// Result: a complete HTML file.
 func (r *Renderer) RenderPage(page *parser.Page, allPages []*parser.Page) (string, error) {
-	// Κάθε φορά φορτώνουμε φρέσκο template set (layout.html + page.html)
+	// Load a fresh template set each time (layout.html + page.html)
 	files := []string{r.layoutPath}
 	if r.pagePath != "" {
 		files = append(files, r.pagePath)
@@ -112,7 +112,7 @@ func (r *Renderer) RenderPage(page *parser.Page, allPages []*parser.Page) (strin
 
 	tmpl, err := template.New("layout.html").Funcs(r.funcMap).ParseFiles(files...)
 	if err != nil {
-		return "", fmt.Errorf("σφάλμα parsing page templates: %w", err)
+		return "", fmt.Errorf("error parsing page templates: %w", err)
 	}
 
 	data := PageData{
@@ -123,17 +123,17 @@ func (r *Renderer) RenderPage(page *parser.Page, allPages []*parser.Page) (strin
 	}
 
 	var buf bytes.Buffer
-	// Εκτελούμε το "layout.html" που καλεί {{template "content" .}}
-	// το οποίο είναι defined στο page.html
+	// Execute "layout.html" which calls {{template "content" .}}
+	// defined in page.html
 	if err := tmpl.ExecuteTemplate(&buf, "layout.html", data); err != nil {
-		return "", fmt.Errorf("σφάλμα rendering σελίδας '%s': %w", page.Title, err)
+		return "", fmt.Errorf("error rendering page '%s': %w", page.Title, err)
 	}
 	return buf.String(), nil
 }
 
-// RenderIndex δημιουργεί το index.html.
-// Αν υπάρχει templates/index.html, το χρησιμοποιεί ως "content" block μέσα στο layout.
-// Αλλιώς, δημιουργεί αυτόματα μια λίστα με links.
+// RenderIndex generates the index.html.
+// If templates/index.html exists, it is used as the "content" block inside the layout.
+// Otherwise, a simple list of page links is generated automatically.
 func (r *Renderer) RenderIndex(allPages []*parser.Page) (string, error) {
 	data := PageData{
 		Site:  r.siteData,
@@ -148,35 +148,35 @@ func (r *Renderer) RenderIndex(allPages []*parser.Page) (string, error) {
 	var err error
 
 	if r.indexPath != "" {
-		// Φορτώνουμε layout.html + index.html μαζί στο ίδιο template set
-		// Το index.html ορίζει {{define "content"}} που καλείται από το layout
+		// Load layout.html + index.html together into the same template set.
+		// index.html defines {{define "content"}} called by the layout.
 		tmpl, err = template.New("layout.html").Funcs(r.funcMap).ParseFiles(r.layoutPath, r.indexPath)
 		if err != nil {
-			return "", fmt.Errorf("σφάλμα parsing index templates: %w", err)
+			return "", fmt.Errorf("error parsing index templates: %w", err)
 		}
 	} else {
-		// Fallback: φτιάχνουμε αυτόματα το content με λίστα σελίδων
+		// Fallback: auto-generate content as a list of pages
 		tmpl, err = template.New("layout.html").Funcs(r.funcMap).ParseFiles(r.layoutPath)
 		if err != nil {
-			return "", fmt.Errorf("σφάλμα parsing layout για index: %w", err)
+			return "", fmt.Errorf("error parsing layout for index: %w", err)
 		}
-		// Ορίζουμε inline το "content" template
+		// Define the "content" template inline
 		defaultContent := `{{define "content"}}` + buildDefaultIndexContent(allPages) + `{{end}}`
 		tmpl, err = tmpl.Parse(defaultContent)
 		if err != nil {
-			return "", fmt.Errorf("σφάλμα parsing default index content: %w", err)
+			return "", fmt.Errorf("error parsing default index content: %w", err)
 		}
 		data.Content = ""
 	}
 
 	var buf bytes.Buffer
 	if err := tmpl.ExecuteTemplate(&buf, "layout.html", data); err != nil {
-		return "", fmt.Errorf("σφάλμα rendering index: %w", err)
+		return "", fmt.Errorf("error rendering index: %w", err)
 	}
 	return buf.String(), nil
 }
 
-// buildDefaultIndexContent δημιουργεί ένα απλό HTML list με links σε όλες τις σελίδες.
+// buildDefaultIndexContent generates a simple HTML list linking to all pages.
 func buildDefaultIndexContent(pages []*parser.Page) string {
 	var b bytes.Buffer
 	b.WriteString("<ul class=\"page-list\">\n")

@@ -12,24 +12,24 @@ import (
 	"github.com/georgepatistas/my-ssg/renderer"
 )
 
-// Config ρυθμίζει τον Generator.
+// Config holds the Generator's configuration.
 type Config struct {
-	// Ο root φάκελος του site (αυτός που περνάει η TypeScript CLI)
+	// Root directory of the site (passed by the TypeScript CLI)
 	SiteDir string
 
-	// Υποφάκελοι (σχετικά με τον SiteDir)
+	// Subdirectories (relative to SiteDir)
 	ContentDir   string // default: "content"
 	TemplatesDir string // default: "templates"
 	StaticDir    string // default: "static"
 	OutputDir    string // default: "dist"
 
-	// Δεδομένα για το site
+	// Site metadata
 	SiteTitle   string
 	SiteURL     string
 	Description string
 }
 
-// DefaultConfig επιστρέφει έναν Config με τα default paths.
+// DefaultConfig returns a Config with default paths.
 func DefaultConfig(siteDir string) Config {
 	return Config{
 		SiteDir:      siteDir,
@@ -43,17 +43,17 @@ func DefaultConfig(siteDir string) Config {
 	}
 }
 
-// Generator είναι ο κεντρικός orchestrator.
+// Generator is the central orchestrator.
 type Generator struct {
 	cfg Config
 }
 
-// New δημιουργεί έναν Generator.
+// New creates a new Generator.
 func New(cfg Config) *Generator {
 	return &Generator{cfg: cfg}
 }
 
-// Build εκτελεί ολόκληρη τη διαδικασία παραγωγής του site.
+// Build runs the full site generation pipeline.
 func (g *Generator) Build() error {
 	cfg := g.cfg
 
@@ -62,33 +62,33 @@ func (g *Generator) Build() error {
 	staticDir := filepath.Join(cfg.SiteDir, cfg.StaticDir)
 	outputDir := filepath.Join(cfg.SiteDir, cfg.OutputDir)
 
-	// 1. Καθαρισμός και δημιουργία output dir
-	fmt.Printf("📁 Δημιουργία output dir: %s\n", outputDir)
+	// 1. Clean and create the output directory
+	fmt.Printf("📁 Creating output directory: %s\n", outputDir)
 	if err := os.RemoveAll(outputDir); err != nil {
-		return fmt.Errorf("σφάλμα καθαρισμού output dir: %w", err)
+		return fmt.Errorf("error cleaning output directory: %w", err)
 	}
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return fmt.Errorf("σφάλμα δημιουργίας output dir: %w", err)
+		return fmt.Errorf("error creating output directory: %w", err)
 	}
 
-	// 2. Parsing όλων των markdown αρχείων
-	fmt.Printf("📖 Parsing markdown από: %s\n", contentDir)
+	// 2. Parse all markdown files
+	fmt.Printf("📖 Parsing markdown from: %s\n", contentDir)
 	pages, err := g.parseContent(contentDir)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("   ✓ Βρέθηκαν %d σελίδες\n", len(pages))
+	fmt.Printf("   ✓ Found %d pages\n", len(pages))
 
-	// Φιλτράρουμε drafts
+	// Filter out drafts
 	publishedPages := filterDrafts(pages)
-	fmt.Printf("   ✓ %d σελίδες για δημοσίευση (χωρίς drafts)\n", len(publishedPages))
+	fmt.Printf("   ✓ %d pages to publish (drafts excluded)\n", len(publishedPages))
 
-	// Ταξινόμηση κατά ημερομηνία (νεότερες πρώτα)
+	// Sort by date (newest first)
 	sort.Slice(publishedPages, func(i, j int) bool {
 		return publishedPages[i].Date.After(publishedPages[j].Date)
 	})
 
-	// 3. Δημιουργία του Renderer
+	// 3. Create the Renderer
 	siteData := renderer.SiteData{
 		SiteTitle:   cfg.SiteTitle,
 		SiteURL:     cfg.SiteURL,
@@ -96,25 +96,25 @@ func (g *Generator) Build() error {
 	}
 	r, err := renderer.New(templateDir, siteData)
 	if err != nil {
-		return fmt.Errorf("σφάλμα φόρτωσης templates: %w", err)
+		return fmt.Errorf("error loading templates: %w", err)
 	}
 
-	// 4. Render κάθε σελίδα
-	fmt.Println("🔨 Rendering σελίδων...")
+	// 4. Render each page
+	fmt.Println("🔨 Rendering pages...")
 	for _, page := range publishedPages {
 		html, err := r.RenderPage(page, publishedPages)
 		if err != nil {
-			fmt.Printf("   ⚠️  Παράλειψη '%s': %v\n", page.OutputFile, err)
+			fmt.Printf("   ⚠️  Skipping '%s': %v\n", page.OutputFile, err)
 			continue
 		}
 
 		outputPath := filepath.Join(outputDir, page.OutputFile)
-		// Δημιουργία subdirectory αν χρειάζεται
+		// Create subdirectory if needed
 		if err := os.MkdirAll(filepath.Dir(outputPath), 0755); err != nil {
-			return fmt.Errorf("σφάλμα δημιουργίας dir για '%s': %w", page.OutputFile, err)
+			return fmt.Errorf("error creating directory for '%s': %w", page.OutputFile, err)
 		}
 		if err := os.WriteFile(outputPath, []byte(html), 0644); err != nil {
-			return fmt.Errorf("σφάλμα αποθήκευσης '%s': %w", page.OutputFile, err)
+			return fmt.Errorf("error writing '%s': %w", page.OutputFile, err)
 		}
 		fmt.Printf("   ✓ %s → %s\n", page.Title, page.OutputFile)
 	}
@@ -123,30 +123,30 @@ func (g *Generator) Build() error {
 	fmt.Println("🏠 Rendering index.html...")
 	indexHTML, err := r.RenderIndex(publishedPages)
 	if err != nil {
-		return fmt.Errorf("σφάλμα rendering index: %w", err)
+		return fmt.Errorf("error rendering index: %w", err)
 	}
 	if err := os.WriteFile(filepath.Join(outputDir, "index.html"), []byte(indexHTML), 0644); err != nil {
-		return fmt.Errorf("σφάλμα αποθήκευσης index.html: %w", err)
+		return fmt.Errorf("error writing index.html: %w", err)
 	}
 	fmt.Println("   ✓ index.html")
 
-	// 6. Αντιγραφή static assets
+	// 6. Copy static assets
 	if _, err := os.Stat(staticDir); !os.IsNotExist(err) {
-		fmt.Printf("📦 Αντιγραφή static assets από: %s\n", staticDir)
+		fmt.Printf("📦 Copying static assets from: %s\n", staticDir)
 		if err := copyDir(staticDir, outputDir); err != nil {
-			return fmt.Errorf("σφάλμα αντιγραφής static assets: %w", err)
+			return fmt.Errorf("error copying static assets: %w", err)
 		}
-		fmt.Println("   ✓ Static assets αντιγράφηκαν")
+		fmt.Println("   ✓ Static assets copied")
 	}
 
-	fmt.Printf("\n✅ Site δημιουργήθηκε επιτυχώς στο: %s\n", outputDir)
+	fmt.Printf("\n✅ Site successfully generated at: %s\n", outputDir)
 	return nil
 }
 
-// parseContent διαβάζει όλα τα .md αρχεία από τον contentDir (αναδρομικά).
+// parseContent reads all .md files from contentDir recursively.
 func (g *Generator) parseContent(contentDir string) ([]*parser.Page, error) {
 	if _, err := os.Stat(contentDir); os.IsNotExist(err) {
-		return nil, fmt.Errorf("δεν βρέθηκε φάκελος content: %s", contentDir)
+		return nil, fmt.Errorf("content directory not found: %s", contentDir)
 	}
 
 	var pages []*parser.Page
@@ -161,28 +161,28 @@ func (g *Generator) parseContent(contentDir string) ([]*parser.Page, error) {
 
 		content, err := os.ReadFile(path)
 		if err != nil {
-			return fmt.Errorf("σφάλμα ανάγνωσης '%s': %w", path, err)
+			return fmt.Errorf("error reading '%s': %w", path, err)
 		}
 
 		page, err := parser.Parse(content)
 		if err != nil {
-			fmt.Printf("   ⚠️  Παράλειψη '%s': %v\n", path, err)
+			fmt.Printf("   ⚠️  Skipping '%s': %v\n", path, err)
 			return nil
 		}
 
-		// Μετατροπή markdown → HTML
+		// Convert markdown to HTML
 		htmlContent, err := parser.MarkdownToHTML(page.RawMarkdown)
 		if err != nil {
-			return fmt.Errorf("σφάλμα μετατροπής markdown '%s': %w", path, err)
+			return fmt.Errorf("error converting markdown '%s': %w", path, err)
 		}
 		page.HTMLContent = htmlContent
 
-		// Υπολογισμός output path
+		// Compute output path
 		relPath, _ := filepath.Rel(contentDir, path)
 		page.OutputFile = strings.TrimSuffix(relPath, ".md") + ".html"
 		page.OutputFile = filepath.ToSlash(page.OutputFile) // Windows-safe
 
-		// Χρήση custom slug αν υπάρχει
+		// Use custom slug if provided
 		if page.Slug != "" {
 			dir := filepath.Dir(page.OutputFile)
 			if dir == "." {
@@ -194,7 +194,7 @@ func (g *Generator) parseContent(contentDir string) ([]*parser.Page, error) {
 
 		page.URL = "/" + page.OutputFile
 
-		// Αν δεν έχει τίτλο, παίρνουμε από το filename
+		// Fall back to filename as title if none provided
 		if page.Title == "" {
 			base := strings.TrimSuffix(filepath.Base(path), ".md")
 			page.Title = strings.ReplaceAll(base, "-", " ")
@@ -208,7 +208,7 @@ func (g *Generator) parseContent(contentDir string) ([]*parser.Page, error) {
 	return pages, err
 }
 
-// filterDrafts επιστρέφει μόνο τις σελίδες που δεν είναι draft.
+// filterDrafts returns only pages that are not marked as drafts.
 func filterDrafts(pages []*parser.Page) []*parser.Page {
 	var result []*parser.Page
 	for _, p := range pages {
@@ -219,7 +219,7 @@ func filterDrafts(pages []*parser.Page) []*parser.Page {
 	return result
 }
 
-// copyDir αντιγράφει αναδρομικά τα περιεχόμενα του src στο dst.
+// copyDir recursively copies the contents of src into dst.
 func copyDir(src, dst string) error {
 	return filepath.WalkDir(src, func(path string, d os.DirEntry, err error) error {
 		if err != nil {
@@ -237,7 +237,7 @@ func copyDir(src, dst string) error {
 	})
 }
 
-// copyFile αντιγράφει ένα αρχείο.
+// copyFile copies a single file from src to dst.
 func copyFile(src, dst string) error {
 	srcFile, err := os.Open(src)
 	if err != nil {

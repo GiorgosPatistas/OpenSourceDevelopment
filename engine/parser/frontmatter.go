@@ -9,38 +9,38 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Page αντιπροσωπεύει ένα parsed markdown αρχείο με metadata και HTML content.
+// Page represents a parsed markdown file with its metadata and HTML content.
 type Page struct {
-	// Metadata από το YAML front matter
+	// Metadata from the YAML front matter
 	Title       string    `yaml:"title"`
 	Date        time.Time `yaml:"date"`
 	Description string    `yaml:"description"`
 	Draft       bool      `yaml:"draft"`
-	Slug        string    `yaml:"slug"` // προαιρετικό custom URL slug
+	Slug        string    `yaml:"slug"` // optional custom URL slug
 
-	// Γεμίζουν μετά το parsing
-	RawMarkdown string // το markdown χωρίς το front matter
-	HTMLContent string // το τελικό HTML μετά τη μετατροπή
-	OutputFile  string // το όνομα του output HTML αρχείου (π.χ. "about.html")
-	URL         string // το relative URL (π.χ. "/about.html")
+	// Populated after parsing
+	RawMarkdown string // the markdown content without the front matter
+	HTMLContent string // the final HTML after conversion
+	OutputFile  string // the output HTML filename (e.g. "about.html")
+	URL         string // the relative URL (e.g. "/about.html")
 }
 
 var (
-	ErrNoFrontMatter    = errors.New("δεν βρέθηκε YAML front matter (--- ... ---)")
-	ErrInvalidFrontMatter = errors.New("μη έγκυρο YAML front matter")
+	ErrNoFrontMatter      = errors.New("no YAML front matter found (--- ... ---)")
+	ErrInvalidFrontMatter = errors.New("invalid YAML front matter")
 )
 
-// Parse διαβάζει ένα .md αρχείο, εξάγει το YAML front matter και επιστρέφει ένα Page.
-// Το front matter πρέπει να αρχίζει με "---" στην πρώτη γραμμή.
+// Parse reads a .md file, extracts the YAML front matter, and returns a Page.
+// The front matter must begin with "---" on the first line.
 func Parse(content []byte) (*Page, error) {
 	text := string(content)
 
-	// Έλεγχος αν αρχίζει με ---
+	// Check if the file starts with ---
 	if !strings.HasPrefix(strings.TrimLeft(text, "\r\n"), "---") {
 		return nil, ErrNoFrontMatter
 	}
 
-	// Βρίσκουμε το κλείσιμο ---
+	// Find the closing ---
 	parts := splitFrontMatter(text)
 	if parts == nil {
 		return nil, ErrInvalidFrontMatter
@@ -59,29 +59,29 @@ func Parse(content []byte) (*Page, error) {
 	return page, nil
 }
 
-// splitFrontMatter χωρίζει το content σε [yamlPart, markdownPart].
-// Επιστρέφει nil αν δεν βρεθεί σωστό front matter.
+// splitFrontMatter splits the content into [yamlPart, markdownPart].
+// Returns nil if no valid front matter is found.
 func splitFrontMatter(text string) []string {
-	// Αφαίρεση leading newline αν υπάρχει
+	// Strip leading newlines if present
 	text = strings.TrimLeft(text, "\r\n")
 
-	// Αφαίρεση του πρώτου ---
+	// Remove the opening ---
 	if !strings.HasPrefix(text, "---") {
 		return nil
 	}
 	text = text[3:]
 
-	// Πάμε στην επόμενη γραμμή
+	// Advance to the next line
 	idx := strings.Index(text, "\n")
 	if idx == -1 {
 		return nil
 	}
 	text = text[idx+1:]
 
-	// Βρίσκουμε το κλείσιμο ---
+	// Find the closing ---
 	closeIdx := strings.Index(text, "\n---")
 	if closeIdx == -1 {
-		// Δοκιμάζουμε αν τελειώνει αμέσως με ---
+		// Check if it closes immediately with ---
 		if strings.HasPrefix(text, "---") {
 			return []string{"", text[3:]}
 		}
@@ -89,9 +89,9 @@ func splitFrontMatter(text string) []string {
 	}
 
 	yamlPart := text[:closeIdx]
-	rest := text[closeIdx+4:] // +4 για να skip-άρουμε το "\n---"
+	rest := text[closeIdx+4:] // +4 to skip "\n---"
 
-	// Skip τυχόν newline μετά το κλείσιμο ---
+	// Skip any newline after the closing ---
 	rest = strings.TrimLeft(rest, "\r\n")
 
 	return []string{yamlPart, rest}

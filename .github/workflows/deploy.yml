@@ -1,20 +1,20 @@
 name: Deploy to GitHub Pages
 
-# Τρέχει σε κάθε push στο main
+# Runs on every push to main
 on:
   push:
     branches: [main]
 
-  # Επιτρέπει και manual trigger από το GitHub Actions tab
+  # Also allows manual trigger from the GitHub Actions tab
   workflow_dispatch:
 
-# Permissions για GitHub Pages deployment
+# Permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Αποτρέπει παράλληλα deployments
+# Prevents concurrent deployments
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -32,7 +32,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ── 1. Compile το Go engine ──────────────────────────────────────────────
+      # ── 1. Compile the Go engine ─────────────────────────────────────────────
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -49,7 +49,7 @@ jobs:
       - name: Make engine executable
         run: chmod +x bin/engine-linux
 
-      # ── 2. Build το TypeScript CLI ───────────────────────────────────────────
+      # ── 2. Build the TypeScript CLI ──────────────────────────────────────────
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -67,11 +67,11 @@ jobs:
       - name: Build TypeScript CLI
         run: pnpm build
 
-      # ── 3. Τρέξε τον generator ───────────────────────────────────────────────
+      # ── 3. Run the site generator ────────────────────────────────────────────
       - name: Generate site
         run: node dist/index.js build example-site
 
-      # ── 4. Deploy στο GitHub Pages ───────────────────────────────────────────
+      # ── 4. Deploy to GitHub Pages ────────────────────────────────────────────
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
 

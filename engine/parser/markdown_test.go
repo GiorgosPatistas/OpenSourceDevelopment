@@ -6,7 +6,7 @@ import (
 )
 
 func TestMarkdownToHTML(t *testing.T) {
-	t.Run("heading παράγει <h1>", func(t *testing.T) {
+	t.Run("heading produces <h1>", func(t *testing.T) {
 		html, err := MarkdownToHTML("# Hello World")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -19,7 +19,7 @@ func TestMarkdownToHTML(t *testing.T) {
 		}
 	})
 
-	t.Run("bold κείμενο παράγει <strong>", func(t *testing.T) {
+	t.Run("bold text produces <strong>", func(t *testing.T) {
 		html, err := MarkdownToHTML("**bold text**")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -29,7 +29,7 @@ func TestMarkdownToHTML(t *testing.T) {
 		}
 	})
 
-	t.Run("link παράγει <a href>", func(t *testing.T) {
+	t.Run("link produces <a href>", func(t *testing.T) {
 		html, err := MarkdownToHTML("[click here](https://example.com)")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -42,7 +42,7 @@ func TestMarkdownToHTML(t *testing.T) {
 		}
 	})
 
-	t.Run("GFM table παράγει <table>", func(t *testing.T) {
+	t.Run("GFM table produces <table>", func(t *testing.T) {
 		md := "| Name  | Age |\n|-------|-----|\n| Alice | 30  |"
 		html, err := MarkdownToHTML(md)
 		if err != nil {
@@ -56,7 +56,7 @@ func TestMarkdownToHTML(t *testing.T) {
 		}
 	})
 
-	t.Run("unordered list παράγει <ul>", func(t *testing.T) {
+	t.Run("unordered list produces <ul>", func(t *testing.T) {
 		html, err := MarkdownToHTML("- item one\n- item two\n- item three")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -69,7 +69,7 @@ func TestMarkdownToHTML(t *testing.T) {
 		}
 	})
 
-	t.Run("άδεια είσοδος επιστρέφει άδειο string", func(t *testing.T) {
+	t.Run("empty input returns empty string", func(t *testing.T) {
 		html, err := MarkdownToHTML("")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)

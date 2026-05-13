@@ -7,7 +7,7 @@ import (
 )
 
 func TestFilterDrafts(t *testing.T) {
-	t.Run("mixed: κρατάει μόνο published", func(t *testing.T) {
+	t.Run("mixed: keeps only published pages", func(t *testing.T) {
 		pages := []*parser.Page{
 			{Title: "Published Post", Draft: false},
 			{Title: "Draft Post", Draft: true},
@@ -19,12 +19,12 @@ func TestFilterDrafts(t *testing.T) {
 		}
 		for _, p := range result {
 			if p.Draft {
-				t.Errorf("draft page '%s' δεν έπρεπε να είναι στο αποτέλεσμα", p.Title)
+				t.Errorf("draft page '%s' should not be in the result", p.Title)
 			}
 		}
 	})
 
-	t.Run("όλα drafts → άδειο slice", func(t *testing.T) {
+	t.Run("all drafts → empty slice", func(t *testing.T) {
 		pages := []*parser.Page{
 			{Title: "Draft 1", Draft: true},
 			{Title: "Draft 2", Draft: true},
@@ -35,7 +35,7 @@ func TestFilterDrafts(t *testing.T) {
 		}
 	})
 
-	t.Run("κανένα draft → επιστρέφει όλες", func(t *testing.T) {
+	t.Run("no drafts → returns all pages", func(t *testing.T) {
 		pages := []*parser.Page{
 			{Title: "Post 1", Draft: false},
 			{Title: "Post 2", Draft: false},
@@ -47,7 +47,7 @@ func TestFilterDrafts(t *testing.T) {
 		}
 	})
 
-	t.Run("άδειο slice → nil ή άδειο", func(t *testing.T) {
+	t.Run("empty slice → nil or empty", func(t *testing.T) {
 		result := filterDrafts([]*parser.Page{})
 		if len(result) != 0 {
 			t.Errorf("expected 0 pages for empty input, got %d", len(result))

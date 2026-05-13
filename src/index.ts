@@ -8,56 +8,56 @@ import { getEnginePath } from './utils';
 
 const program = new Command();
 
-// --- Η λογική που καλεί την Go ---
+// --- Logic that calls the Go engine ---
 async function buildSite(targetDir: string) {
-    console.log(`Ξεκινάει το χτίσιμο του site από τον φάκελο: ${targetDir}...`);
+    console.log(`Starting site build from directory: ${targetDir}...`);
 
     try {
-        // Έλεγχος αν ο φάκελος που έδωσε ο χρήστης υπάρχει
+        // Check if the directory provided by the user exists
         const fullPath = path.resolve(process.cwd(), targetDir);
         await fs.access(fullPath);
 
         const enginePath = getEnginePath();
 
-        console.log(`Καλείται η μηχανή Go: ${enginePath}`);
+        console.log(`Calling Go engine: ${enginePath}`);
 
-        // Εδώ "ξυπνάμε" το εκτελέσιμο της Go και του περνάμε τον φάκελο
+        // Spawn the Go executable and pass the directory path
         const goProcess = spawn(enginePath, [fullPath]);
 
-        // "Ακούμε" τι μας στέλνει η Go στο stdout (π.χ. μηνύματα επιτυχίας)
+        // Listen for output from Go's stdout (e.g. success messages)
         goProcess.stdout.on('data', (data) => {
             console.log(data.toString());
         });
 
-        // "Ακούμε" για σφάλματα από την Go
+        // Listen for errors from Go's stderr
         goProcess.stderr.on('data', (data) => {
-            console.error(`Σφάλμα από τη μηχανή Go: ${data.toString()}`);
+            console.error(`Error from Go engine: ${data.toString()}`);
         });
 
-        // Τι κάνουμε όταν τελειώσει η Go
+        // Handle process exit
         goProcess.on('close', (code) => {
             if (code === 0) {
-                console.log('✅ Το site δημιουργήθηκε με επιτυχία!');
+                console.log('✅ Site generated successfully!');
             } else {
-                console.error(`❌ Η διαδικασία απέτυχε με κωδικό ${code}`);
+                console.error(`❌ Process failed with exit code ${code}`);
             }
         });
 
     } catch (error) {
-        console.error(`❌ Σφάλμα: Ο φάκελος '${targetDir}' δεν βρέθηκε ή δεν είναι προσβάσιμος.`);
+        console.error(`❌ Error: Directory '${targetDir}' not found or not accessible.`);
     }
 }
 
-// --- Στήσιμο Commander ---
+// --- Commander setup ---
 program
   .name('my-ssg')
-  .description('Ένας Static Site Generator με TypeScript και Go')
+  .description('A Static Site Generator built with TypeScript and Go')
   .version('1.0.0');
 
 program
   .command('build')
-  .description('Μετατρέπει τα Markdown αρχεία ενός φακέλου σε HTML')
-  .argument('<directory>', 'Ο φάκελος που περιέχει τα Markdown αρχεία')
+  .description('Converts the Markdown files in a directory into HTML')
+  .argument('<directory>', 'The directory containing the Markdown files')
   .action((directory) => {
       buildSite(directory);
   });

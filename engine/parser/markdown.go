@@ -9,25 +9,25 @@ import (
 	"github.com/yuin/goldmark/renderer/html"
 )
 
-// mdConverter είναι ο goldmark instance με όλα τα extensions ενεργά.
+// mdConverter is the goldmark instance with all extensions enabled.
 var mdConverter = goldmark.New(
 	goldmark.WithExtensions(
-		extension.GFM,           // GitHub Flavored Markdown (tables, strikethrough, task lists, autolink)
-		extension.Footnote,      // Υποσημειώσεις
+		extension.GFM,            // GitHub Flavored Markdown (tables, strikethrough, task lists, autolink)
+		extension.Footnote,       // Footnotes
 		extension.DefinitionList, // Definition lists
-		extension.Typographer,   // Έξυπνα εισαγωγικά, em-dashes κλπ.
+		extension.Typographer,    // Smart quotes, em-dashes, etc.
 	),
 	goldmark.WithParserOptions(
-		parser.WithAutoHeadingID(), // Αυτόματα IDs σε headings για anchor links
+		parser.WithAutoHeadingID(), // Auto-generate IDs on headings for anchor links
 	),
 	goldmark.WithRendererOptions(
-		html.WithHardWraps(), // Σκληρά line breaks
+		html.WithHardWraps(), // Hard line breaks
 		html.WithXHTML(),     // XHTML output
-		html.WithUnsafe(),    // Επιτρέπει raw HTML μέσα στο markdown
+		html.WithUnsafe(),    // Allow raw HTML inside markdown
 	),
 )
 
-// MarkdownToHTML μετατρέπει markdown σε HTML string.
+// MarkdownToHTML converts a markdown string to an HTML string.
 func MarkdownToHTML(markdown string) (string, error) {
 	var buf bytes.Buffer
 	if err := mdConverter.Convert([]byte(markdown), &buf); err != nil {

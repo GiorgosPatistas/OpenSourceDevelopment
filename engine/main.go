@@ -9,7 +9,7 @@ import (
 	"github.com/georgepatistas/my-ssg/generator"
 )
 
-// siteConfig αντικατοπτρίζει το προαιρετικό ssg.config.json
+// siteConfig mirrors the optional ssg.config.json file
 type siteConfig struct {
 	SiteTitle   string `json:"siteTitle"`
 	SiteURL     string `json:"siteUrl"`
@@ -21,38 +21,38 @@ type siteConfig struct {
 }
 
 func main() {
-	// Το TypeScript CLI περνάει τον φάκελο ως πρώτο argument
+	// The TypeScript CLI passes the site directory as the first argument
 	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, "❌ Χρήση: engine <path/to/site>")
+		fmt.Fprintln(os.Stderr, "❌ Usage: engine <path/to/site>")
 		os.Exit(1)
 	}
 
 	siteDir := os.Args[1]
 
-	// Έλεγχος αν υπάρχει ο φάκελος
+	// Check if the directory exists
 	if _, err := os.Stat(siteDir); os.IsNotExist(err) {
-		fmt.Fprintf(os.Stderr, "❌ Ο φάκελος δεν υπάρχει: %s\n", siteDir)
+		fmt.Fprintf(os.Stderr, "❌ Directory not found: %s\n", siteDir)
 		os.Exit(1)
 	}
 
-	// Φόρτωση default config
+	// Load default config
 	cfg := generator.DefaultConfig(siteDir)
 
-	// Προσπάθεια φόρτωσης ssg.config.json αν υπάρχει
+	// Try to load ssg.config.json if it exists
 	configPath := filepath.Join(siteDir, "ssg.config.json")
 	if _, err := os.Stat(configPath); !os.IsNotExist(err) {
 		if sc, err := loadSiteConfig(configPath); err == nil {
 			applyConfig(&cfg, sc)
-			fmt.Printf("⚙️  Φόρτωση config από: %s\n", configPath)
+			fmt.Printf("⚙️  Loading config from: %s\n", configPath)
 		}
 	}
 
-	fmt.Printf("🚀 Ξεκινάει το build για: %s\n", siteDir)
+	fmt.Printf("🚀 Starting build for: %s\n", siteDir)
 	fmt.Println("──────────────────────────────────────────")
 
 	gen := generator.New(cfg)
 	if err := gen.Build(); err != nil {
-		fmt.Fprintf(os.Stderr, "\n❌ Build απέτυχε: %v\n", err)
+		fmt.Fprintf(os.Stderr, "\n❌ Build failed: %v\n", err)
 		os.Exit(1)
 	}
 }
