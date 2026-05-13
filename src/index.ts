@@ -4,32 +4,11 @@ import { Command } from 'commander';
 import { spawn } from 'child_process';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as os from 'os';
+import { getEnginePath } from './utils';
 
 const program = new Command();
 
-// --- 1. Η λογική για να βρούμε το εκτελέσιμο της Go ---
-function getEnginePath(): string {
-    const platform = os.platform();
-    const arch = os.arch();
-    // Τα εκτελέσιμα βρίσκονται στον φάκελο 'bin'
-    // στο ίδιο επίπεδο με τον φάκελο 'dist'
-    const binDir = path.resolve(__dirname, '../bin');
-
-    if (platform === 'win32') {
-        return path.join(binDir, 'engine-windows.exe');
-    } else if (platform === 'darwin') {
-        // Apple Silicon (M1/M2/M3) ή Intel
-        if (arch === 'arm64') {
-            return path.join(binDir, 'engine-mac-arm64');
-        }
-        return path.join(binDir, 'engine-mac');
-    } else {
-        return path.join(binDir, 'engine-linux');
-    }
-}
-
-// --- 2. Η λογική που καλεί την Go ---
+// --- Η λογική που καλεί την Go ---
 async function buildSite(targetDir: string) {
     console.log(`Ξεκινάει το χτίσιμο του site από τον φάκελο: ${targetDir}...`);
 
@@ -69,7 +48,7 @@ async function buildSite(targetDir: string) {
     }
 }
 
-// --- 3. Το στήσιμο του Commander ---
+// --- Στήσιμο Commander ---
 program
   .name('my-ssg')
   .description('Ένας Static Site Generator με TypeScript και Go')
