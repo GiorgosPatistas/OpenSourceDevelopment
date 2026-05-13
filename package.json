@@ -7,8 +7,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "link-cli": "(yarn --global unlink typescriptcli || true) && yarn --global link",
-    "dev": "tsc --watch"
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "dev": "node ./dist/index.js",
+    "link-cli": "pnpm link --global"
   },
   "keywords": [],
   "author": "",

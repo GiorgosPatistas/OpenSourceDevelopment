@@ -1,0 +1,31 @@
+{{define "content"}}
+<section class="home">
+    <div class="hero">
+        <h1>{{.Site.SiteTitle}}</h1>
+        {{if .Site.Description}}
+        <p class="site-description">{{.Site.Description}}</p>
+        {{end}}
+    </div>
+
+    <div class="posts">
+        <h2>Αναρτήσεις</h2>
+        {{if .Pages}}
+        <ul class="post-list">
+            {{range .Pages}}
+            <li class="post-item">
+                <a href="{{.URL}}" class="post-title">{{.Title}}</a>
+                {{if not .Date.IsZero}}
+                <time datetime="{{formatDateISO .Date}}">{{formatDate .Date}}</time>
+                {{end}}
+                {{if .Description}}
+                <p class="post-excerpt">{{.Description}}</p>
+                {{end}}
+            </li>
+            {{end}}
+        </ul>
+        {{else}}
+        <p>Δεν βρέθηκαν αναρτήσεις.</p>
+        {{end}}
+    </div>
+</section>
+{{end}}

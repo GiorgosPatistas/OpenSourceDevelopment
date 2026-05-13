@@ -1,2 +1,15 @@
-node_modules
-dist
+# Node
+node_modules/
+
+# TypeScript build output
+dist/
+
+# Go binaries
+bin/
+
+# Site output
+example-site/dist/
+
+# OS files
+.DS_Store
+Thumbs.db

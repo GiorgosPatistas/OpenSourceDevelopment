@@ -1,0 +1,19 @@
+{{define "content"}}
+<article class="page">
+    <header class="page-header">
+        <h1>{{.Page.Title}}</h1>
+        {{if not .Page.Date.IsZero}}
+        <time class="page-date" datetime="{{formatDateISO .Page.Date}}">
+            {{formatDate .Page.Date}}
+        </time>
+        {{end}}
+        {{if .Page.Description}}
+        <p class="page-description">{{.Page.Description}}</p>
+        {{end}}
+    </header>
+
+    <div class="page-content">
+        {{.Content}}
+    </div>
+</article>
+{{end}}

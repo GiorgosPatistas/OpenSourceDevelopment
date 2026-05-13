@@ -1,0 +1,356 @@
+/* my-ssg default styles */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* ─── CSS Variables — Light Mode (default) ───────────────────────────────── */
+:root {
+    --color-bg:          #ffffff;
+    --color-surface:     #f8f8f8;
+    --color-text:        #1a1a1a;
+    --color-muted:       #666666;
+    --color-accent:      #0066cc;
+    --color-border:      #e5e5e5;
+    --color-code-bg:     #1e1e1e;
+    --color-code-text:   #d4d4d4;
+    --color-inline-code: #f4f4f4;
+    --color-th-bg:       #f8f8f8;
+
+    --font-sans:   -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono:   'Fira Code', 'Cascadia Code', monospace;
+    --max-width:   720px;
+
+    --transition: 0.2s ease;
+}
+
+/* ─── CSS Variables — Dark Mode ──────────────────────────────────────────── */
+[data-theme="dark"] {
+    --color-bg:          #0f0f0f;
+    --color-surface:     #1a1a1a;
+    --color-text:        #e8e8e8;
+    --color-muted:       #888888;
+    --color-accent:      #4da3ff;
+    --color-border:      #2a2a2a;
+    --color-code-bg:     #161616;
+    --color-code-text:   #d4d4d4;
+    --color-inline-code: #2a2a2a;
+    --color-th-bg:       #1e1e1e;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+body {
+    font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.7;
+    margin: 0;
+    padding: 0;
+    transition: background var(--transition), color var(--transition);
+}
+
+/* ─── Reading Progress Bar ───────────────────────────────────────────────── */
+#progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: var(--color-accent);
+    z-index: 1000;
+    transition: width 0.1s linear, background var(--transition);
+
+    /* Κρυφό by default — το JS προσθέτει .visible μόνο σε άρθρα */
+    opacity: 0;
+    pointer-events: none;
+}
+
+#progress-bar.visible {
+    opacity: 1;
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────────── */
+.site-header {
+    border-bottom: 1px solid var(--color-border);
+    padding: 1rem 2rem;
+    transition: border-color var(--transition);
+}
+
+.site-header nav {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.site-title {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+/* Δεξί μέρος του nav: links + toggle button */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-links a {
+    color: var(--color-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color var(--transition);
+}
+
+.nav-links a:hover {
+    color: var(--color-accent);
+}
+
+/* ─── Dark Mode Toggle Button ────────────────────────────────────────────── */
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    padding: 0.3rem 0.7rem;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    transition: border-color var(--transition), background var(--transition);
+    display: flex;
+    align-items: center;
+}
+
+.theme-toggle:hover {
+    background: var(--color-surface);
+}
+
+/* Εμφανίζουμε το σωστό icon ανάλογα με το active theme */
+.theme-toggle .icon-sun  { display: none; }
+.theme-toggle .icon-moon { display: inline; }
+
+[data-theme="dark"] .theme-toggle .icon-sun  { display: inline; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+/* ─── Main Content ───────────────────────────────────────────────────────── */
+.content {
+    max-width: var(--max-width);
+    margin: 3rem auto;
+    padding: 0 2rem;
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────────────── */
+.site-footer {
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-muted);
+    font-size: 0.85rem;
+    margin-top: 4rem;
+    transition: border-color var(--transition);
+}
+
+/* ─── Page / Article ─────────────────────────────────────────────────────── */
+.page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    margin: 0 0 0.5rem;
+}
+
+.page-date {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+}
+
+.page-description {
+    color: var(--color-muted);
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+/* ─── Page Content Typography ────────────────────────────────────────────── */
+.page-content h1,
+.page-content h2,
+.page-content h3 {
+    margin-top: 2rem;
+}
+
+.page-content a {
+    color: var(--color-accent);
+}
+
+.page-content code {
+    font-family: var(--font-mono);
+    background: var(--color-inline-code);
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+    transition: background var(--transition);
+}
+
+.page-content pre {
+    background: var(--color-code-bg);
+    color: var(--color-code-text);
+    padding: 1.2rem 1.5rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;                  /* το margin το βάζει το .code-block wrapper */
+    transition: background var(--transition);
+}
+
+.page-content pre code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+}
+
+.page-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+}
+
+.page-content th,
+.page-content td {
+    border: 1px solid var(--color-border);
+    padding: 0.6rem 1rem;
+    text-align: left;
+    transition: border-color var(--transition);
+}
+
+.page-content th {
+    background: var(--color-th-bg);
+    font-weight: 600;
+    transition: background var(--transition);
+}
+
+/* ─── Code Block Wrapper + Copy Button ──────────────────────────────────── */
+
+/*
+    Ο JS τυλίγει κάθε <pre> σε ένα <div class="code-block">.
+    Αυτό μας δίνει position: relative για το absolute κουμπί.
+*/
+.code-block {
+    position: relative;
+    margin: 1.5rem 0;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+
+    background: rgba(255, 255, 255, 0.1);
+    color: #aaaaaa;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    opacity: 0;                         /* κρυφό by default */
+    transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+    user-select: none;
+}
+
+/* Εμφανίζεται όταν hover στο wrapper */
+.code-block:hover .copy-btn {
+    opacity: 1;
+}
+
+.copy-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+/* Κατάσταση μετά το copy */
+.copy-btn.copied {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: rgba(34, 197, 94, 0.4);
+    color: #22c55e;
+    opacity: 1;
+}
+
+/* ─── Index / Home ───────────────────────────────────────────────────────── */
+.hero {
+    margin-bottom: 3rem;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.site-description {
+    color: var(--color-muted);
+    font-size: 1.1rem;
+}
+
+.posts h2 {
+    font-size: 1.3rem;
+    color: var(--color-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+}
+
+.post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.post-item {
+    padding: 1.2rem 0;
+    border-bottom: 1px solid var(--color-border);
+    transition: border-color var(--transition);
+}
+
+.post-item:last-child {
+    border-bottom: none;
+}
+
+.post-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-text);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 0.25rem;
+    transition: color var(--transition);
+}
+
+.post-title:hover {
+    color: var(--color-accent);
+}
+
+.post-item time {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
+.post-excerpt {
+    margin: 0.4rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+}
